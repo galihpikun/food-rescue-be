@@ -3,4 +3,4 @@
 /generated/prisma
 
 # depedency
-/node_modules
+node_modules
