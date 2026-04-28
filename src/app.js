@@ -13,6 +13,7 @@ app.use(jwtMiddleware);
 // Routes
 app.use('/api/auth', routeAuth);
 
+// Original Route
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
