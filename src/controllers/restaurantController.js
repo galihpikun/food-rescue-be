@@ -7,7 +7,7 @@ export const createRestaurant = async (req, res) => {
 
     // validasi role (role merchant doang yang boleh create resto)
     if (userRole !== 'MERCHANT') {
-        return res.status(403),json({
+        return res.status(403).json({
             success: false,
             message: "role tidak sesuai, tidak boleh membuat resto"
         })

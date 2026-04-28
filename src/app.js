@@ -1,6 +1,7 @@
 import express from 'express';
 import routeAuth from './routes/authRoute.js';
 import { jwtMiddleware } from './middlewares/authMiddleware.js';
+import routeRestaurant from './routes/restaurantRoute.js';
 
 
 const app = express();
@@ -10,6 +11,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', routeAuth);
+
+app.use('/api/restaurants', routeRestaurant)
 
 // Protected Route
 app.get('/', jwtMiddleware, (req, res) => {
