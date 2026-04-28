@@ -1,13 +1,13 @@
 import { prisma } from "../config/db.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../util/generateToken.js";
+import { generateToken } from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
   // Destructure data dari request body
-  const { username, email, password } = req.body;
+  const { fullname, email, password } = req.body;
 
   // Validasi input
-  if (!username || !email || !password) {
+  if (!fullname || !email || !password) {
     return res.status(400).json({
       code: 400,
       message: "Please fill all of the fields",
@@ -16,7 +16,7 @@ export const register = async (req, res) => {
   }
 
   // if exist check
-  const emailExists = await prisma.users.findUnique({
+  const emailExists = await prisma.user.findUnique({
     where: {
       email: email,
     },
@@ -35,9 +35,9 @@ export const register = async (req, res) => {
   const hashedPw = await bcrypt.hash(password, salt);
 
   try {
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
-        username: username,
+        fullname: fullname,
         email: email,
         password: hashedPw,
       },
@@ -65,7 +65,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     // If exist check
-    const emailExists = await prisma.users.findUnique({
+    const emailExists = await prisma.user.findUnique({
       where: {
         email: email,
       },
@@ -93,7 +93,7 @@ export const login = async (req, res) => {
     // Generate TOken JWT
     const token = generateToken({
       id: emailExists.id,
-      username: emailExists.username,
+      fullname: emailExists.fullname,
       email: emailExists.email,
       role: emailExists.role
     }, res);

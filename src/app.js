@@ -1,20 +1,18 @@
 import express from 'express';
-import routeAuth from './routes/authRouter.js';
-import { jwtMiddleware } from './middleware/authMiddleware.js';
+import routeAuth from './routes/authRoute.js';
+import { jwtMiddleware } from './middlewares/authMiddleware.js';
 
 
-const app = express()
-const port = 3000
+const app = express();
+const port = 8000;
 
 app.use(express.json());
-// Cek Bearer
-app.use(jwtMiddleware);
 
 // Routes
 app.use('/api/auth', routeAuth);
 
-// Original Route
-app.get('/', (req, res) => {
+// Protected Route
+app.get('/', jwtMiddleware, (req, res) => {
   res.send('Hello World!')
 })
 
