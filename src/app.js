@@ -4,11 +4,16 @@ import { jwtMiddleware } from './middlewares/authMiddleware.js';
 import routeRestaurant from './routes/restaurantRoute.js';
 import routeProduct from './routes/productRoute.js';
 import routeOrder from './routes/orderRoute.js';
+import cors from 'cors';
 
 
 const app = express();
 const port = 8000;
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
