@@ -82,3 +82,129 @@ export const createOrder = async (req, res) => {
     }
     
 }
+
+export const getOrders = async (req, res) => {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    try {
+        let orders;
+
+        if (userRole === 'CUSTOMER') {
+            orders = await prisma.order.findMany({
+                where: { userId: userId },
+                include: {
+                    product: {
+                        select: {
+                            name : true,
+                            imageUrl: true,
+                            restaurant: { select: {name: true}}
+                        },
+                    },
+                },
+                orderBy : { createdAt: 'desc'}
+            });
+        } else if (userRole === 'MERCHANT'){
+            const restaurant = await prisma.restaurant.findUnique({
+                where: { userId: userId }
+            });
+
+            if (!restaurant) {
+                return res.status(404).json({
+                    message: "restoran tidak ditemukan",
+                    success: false
+                })
+            }
+
+            orders = await prisma.order.findMany({
+                where: {
+                    product: { restaurantId: restaurant.id},
+                },
+                include: {
+                    user: { select: {
+                        fullName: true
+                    }},
+                    product: { 
+                        select: {
+                            name: true, 
+                            type: true
+                        }, 
+                    },
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "berhasil mengambil data order",
+            data: orders
+        })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+export const UpdateOrderStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+    const userRole= req.user.role;
+
+    if (userRole === 'MERCHANT') {
+        return res.status(403).json({
+            success: false,
+            message: "role tidak sesuai"
+        })
+    }
+
+    const validStatuses = ["WAITING_PAYMENT", "PREPARING", "READY_FOR_PICKUP", "ON_THE_WAY", "COMPLETED", "CANCELLED"];
+
+    if(!validStatuses.includes(status)){
+        return res.status(400).json({
+            success: false,
+            message: "status ga valid"
+        })
+    }
+
+    try {
+        const restaurant = await prisma.restaurant.findUnique({
+            where: { userId}
+        });
+
+        const order = await prisma.order.findUnique({
+            where: { id: id },
+            include: { product: true } 
+        });
+
+        if (!order || order.product.restaurant.userId !== userId) {
+            return res.status(404).json({
+                message: "bukan milikmu ordernya",
+                success: false
+            })
+        }
+        
+        const updateOrder = await prisma.order.update({
+            where: { id: id},
+            data: { status: status }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: `status pesanan berhasil diubah jadi ${status}`,
+            data: updateOrder 
+        })
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+
+}
