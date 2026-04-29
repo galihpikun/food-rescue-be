@@ -7,116 +7,97 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id         String      @id @default(uuid())
+  email      String      @unique
+  password   String
+  role       Role        @default(CUSTOMER)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  fullname   String
+  orders     Order[]
+  restaurant Restaurant?
+}
+
+model Restaurant {
+  id           String    @id @default(uuid())
+  name         String
+  address      String
+  description  String?
+  totalRevenue Int       @default(0)
+  userId       String    @unique
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+  user         User      @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  categoryName String?
+  products     Product[]
+}
+
+model Product {
+  id                 String      @id @default(uuid())
+  name               String
+  description        String
+  type               ProductType @default(REGULAR)
+  originalPrice      Int
+  sellingPrice       Int
+  stock              Int         @default(1)
+  imageUrl           String?
+  flashSaleStartTime DateTime?
+  flashSaleEndTime   DateTime?
+  restaurantId       String
+  categoryId         Int
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  orders             Order[]
+  category           Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  restaurant         Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                String       @id @default(uuid())
+  userId            String
+  productId         String
+  itemPrice         Int
+  quantity          Int          @default(1)
+  platformFeeBuyer  Int          @default(0)
+  platformFeeSeller Int          @default(0)
+  totalPaidByBuyer  Int
+  netSellerRevenue  Int
+  deliveryType      DeliveryType
+  status            OrderStatus  @default(WAITING_PAYMENT)
+  proofUrl          String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  product           Product      @relation(fields: [productId], references: [id])
+  user              User         @relation(fields: [userId], references: [id])
+}
+
 enum Role {
   CUSTOMER
   MERCHANT
 }
 
 enum DeliveryType {
-  DELIVERY      // Diantar Kurir
-  SELF_PICKUP   // Diambil Sendiri
+  DELIVERY
+  SELF_PICKUP
 }
 
 enum OrderStatus {
   WAITING_PAYMENT
   PREPARING
-  READY_FOR_PICKUP 
-  ON_THE_WAY       
+  READY_FOR_PICKUP
+  ON_THE_WAY
   COMPLETED
   CANCELLED
 }
 
 enum ProductType {
-  REGULAR           
-  DAILY_PERISHABLE  
-  FLASH_SALE        
-}
-
-model User {
-  id          String       @id @default(uuid())
-  email       String       @unique
-  password    String       
-  fullname    String
-  role        Role         @default(CUSTOMER)
-  
-  restaurant  Restaurant?  
-  orders      Order[]      
-  
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model Restaurant {
-  id           String        @id @default(uuid())
-  name         String
-  address      String        @db.Text
-  description  String?       @db.Text
-  
-  totalRevenue Int           @default(0)
-  
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id])
-  
-  products     Product[]
-  
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
-
-model Category {
-  id          String       @id @default(uuid())
-  name        String       @unique 
-  products    Product[]
-}
-
-model Product {
-  id                 String      @id @default(uuid())
-  name               String
-  description        String      @db.Text
-  
-  type               ProductType @default(REGULAR)
-  
-  originalPrice      Int
-  sellingPrice       Int         
-  stock              Int         @default(1)
-  imageUrl           String?
-  
-  flashSaleStartTime DateTime?
-  flashSaleEndTime   DateTime?
-  
-  restaurantId       String
-  restaurant         Restaurant  @relation(fields: [restaurantId], references: [id])
-  
-  categoryId         String
-  category           Category    @relation(fields: [categoryId], references: [id])
-  
-  orders             Order[]
-  
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-}
-
-model Order {
-  id                String       @id @default(uuid())
-  
-  userId            String
-  user              User         @relation(fields: [userId], references: [id])
-  
-  productId         String
-  product           Product      @relation(fields: [productId], references: [id])
-  
-  itemPrice         Int          
-  quantity          Int          @default(1)
-  
-  platformFeeBuyer  Int          @default(0) 
-  platformFeeSeller Int          @default(0) 
-  totalPaidByBuyer  Int          
-  netSellerRevenue  Int          
-  
-  deliveryType      DeliveryType
-  status            OrderStatus  @default(WAITING_PAYMENT)
-  proofUrl          String?      
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  REGULAR
+  DAILY_PERISHABLE
+  FLASH_SALE
 }

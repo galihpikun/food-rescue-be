@@ -32,7 +32,7 @@ export const createProduct = async (req, res) => {
             })
         }
 
-        const product = await prisma.restaurant.create({
+        const product = await prisma.product.create({
             data :{
                 name,
                 description,

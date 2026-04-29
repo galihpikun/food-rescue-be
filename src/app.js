@@ -5,6 +5,7 @@ import routeRestaurant from './routes/restaurantRoute.js';
 import routeProduct from './routes/productRoute.js';
 import routeOrder from './routes/orderRoute.js';
 import cors from 'cors';
+import routeCategory from './routes/categoryRoute.js';
 
 
 const app = express();
@@ -25,6 +26,8 @@ app.use('/api/products', routeProduct);
 
 
 app.use('/api/orders', routeOrder);
+
+app.use('/api/categories', routeCategory);
 // Protected Route
 app.get('/', jwtMiddleware, (req, res) => {
   res.send('Hello World!')
