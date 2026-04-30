@@ -7,9 +7,9 @@ const routeProduct = express.Router();
 routeProduct.get('/', jwtMiddleware, getProducts);
 routeProduct.get('/flash-sales', getFlashSalesProducts);
 routeProduct.post('/', jwtMiddleware, createProduct);
-routeProduct.put('/', jwtMiddleware, editProduct);
+routeProduct.put('/:id', jwtMiddleware, editProduct);
 routeProduct.delete('/:id', jwtMiddleware, deleteProduct);
-routeProduct.get('/:id',jwtMiddleware, getProductById)
+routeProduct.get('/:id', jwtMiddleware, getProductById)
 routeProduct.get('/category/:id', jwtMiddleware, getProductByCategory)
 
 export default routeProduct;

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { prisma } from "../config/db.js";
 
 export const createOrder = async (req, res) => {
     const {productId, quantity, deliveryType} = req.body;
@@ -75,7 +75,7 @@ export const createOrder = async (req, res) => {
         
     } catch (error) {
         console.error(error);
-        return res,status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal server error"
         });
@@ -178,7 +178,11 @@ export const UpdateOrderStatus = async (req, res) => {
 
         const order = await prisma.order.findUnique({
             where: { id: id },
-            include: { product: true } 
+            include: { 
+                product: {
+                    include: { restaurant: true}
+                } 
+            }
         });
 
         if (!order || order.product.restaurant.userId !== userId) {

@@ -4,7 +4,7 @@ import { createCategory, getCategories } from "../controllers/categoryController
 
 const routeCategory = express.Router();
 
-routeCategory.post('/', jwtMiddleware,createCategory);
-routeCategory.get('/',  jwtMiddleware,getCategories);
+routeCategory.post('/', jwtMiddleware, createCategory);
+routeCategory.get('/', getCategories);
 
 export default routeCategory;
