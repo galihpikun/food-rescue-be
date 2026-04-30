@@ -130,3 +130,33 @@ export const logout = async (req, res) => {
     message: "Berhasil logout",
   });
 };
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        fullname: true,
+        email: true,
+        role: true,
+      }
+    })
+    if(!user) {
+      return res.status(404).json({
+        message: "User tidak ditemukan",
+        success: false
+      })
+    }
+
+    res.status(200).json({
+      data: user,
+      success: true,
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    })
+  }
+}
