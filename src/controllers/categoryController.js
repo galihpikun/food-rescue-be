@@ -31,7 +31,7 @@ export const createCategory = async (req, res) => {
   try {
     const category = await prisma.category.create({
       data: {
-        name: name,
+        categoryName: name,
       },
     });
     return res.status(201).json({

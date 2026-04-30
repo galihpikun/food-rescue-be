@@ -24,7 +24,6 @@ app.use('/api/restaurants', routeRestaurant)
 
 app.use('/api/products', routeProduct);
 
-
 app.use('/api/orders', routeOrder);
 
 app.use('/api/categories', routeCategory);

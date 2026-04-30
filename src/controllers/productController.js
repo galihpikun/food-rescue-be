@@ -49,11 +49,11 @@ export const createProduct = async (req, res) => {
         name,
         description,
         type: type || "REGULAR",
-        originalPrice,
-        sellingPrice,
-        stock: stock || 1,
-        imageUrl,
-        categoryId,
+        originalPrice: Number(originalPrice),
+        sellingPrice: Number(sellingPrice),
+        stock: stock ? Number(stock) : 1, 
+        imageUrl, 
+        categoryId: Number(categoryId),
         restaurantId: restaurant.id,
         flashSaleStartTime: flashSaleStartTime
           ? new Date(flashSaleStartTime)
@@ -129,11 +129,12 @@ export const editProduct = async (req, res) => {
     originalPrice,
     sellingPrice,
     stock,
-    imageUrl,
     categoryId,
     flashSaleStartTime,
     flashSaleEndTime,
   } = req.body;
+
+  const imageUrl = req.file ? req.file.path : undefined;
 
   const userId = req.user.id;
   const userRole = req.user.role;
@@ -146,27 +147,17 @@ export const editProduct = async (req, res) => {
   }
 
   try {
-    // Ambil info produk
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      include: {
-        restaurant: true,
-      },
+      include: { restaurant: true },
     });
 
     if (!product) {
-      return res.status(404).json({
-        message: "produk tidak ditemukan",
-        success: false,
-      });
+      return res.status(404).json({ message: "produk tidak ditemukan", success: false });
     }
 
-    // Validasi cek owner produknya bukan
     if (product.restaurant.userId !== userId) {
-      return res.status(403).json({
-        message: "bukan owner produk ini",
-        success: false,
-      });
+      return res.status(403).json({ message: "bukan owner produk ini", success: false });
     }
 
     const productUpdate = await prisma.product.update({
@@ -175,21 +166,18 @@ export const editProduct = async (req, res) => {
         name,
         description,
         type: type || "REGULAR",
-        originalPrice,
-        sellingPrice,
-        stock: stock || 1,
-        imageUrl,
-        categoryId,
-        restaurantId: restaurant.id,
-        flashSaleStartTime: flashSaleStartTime
-          ? new Date(flashSaleStartTime)
-          : null,
+        originalPrice: Number(originalPrice), 
+        sellingPrice: Number(sellingPrice),   
+        stock: stock ? Number(stock) : 1,     
+        imageUrl: imageUrl !== undefined ? imageUrl : product.imageUrl, 
+        categoryId: Number(categoryId), 
+        flashSaleStartTime: flashSaleStartTime ? new Date(flashSaleStartTime) : null,
         flashSaleEndTime: flashSaleEndTime ? new Date(flashSaleEndTime) : null,
       },
     });
 
-    return res.status(201).json({
-      message: "berhasil menambahkan makanan!",
+    return res.status(200).json({
+      message: "berhasil mengupdate makanan!",
       success: true,
       data: productUpdate,
     });
@@ -198,11 +186,9 @@ export const editProduct = async (req, res) => {
     return res.status(500).json({
       message: "Internal Server Error",
       success: false,
-      code: 500,
     });
   }
 };
-
 export const deleteProduct = async (req, res) => {
   const productId = req.params.id;
 
@@ -217,7 +203,6 @@ export const deleteProduct = async (req, res) => {
   }
 
   try {
-    // Cek Produk
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: {
@@ -232,8 +217,7 @@ export const deleteProduct = async (req, res) => {
       });
     }
 
-    // Validasi cek owner produknya bukan
-    if (product.restaurant.userId !== userId) {
+     if (product.restaurant.userId !== userId) {
       return res.status(403).json({
         message: "bukan owner produk ini",
         success: false,

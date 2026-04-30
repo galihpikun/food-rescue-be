@@ -122,7 +122,7 @@ export const getOrders = async (req, res) => {
                 },
                 include: {
                     user: { select: {
-                        fullName: true
+                        fullname: true
                     }},
                     product: { 
                         select: {
