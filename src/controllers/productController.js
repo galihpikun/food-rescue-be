@@ -256,3 +256,63 @@ export const deleteProduct = async (req, res) => {
     });
   }
 };
+
+export const getProductById = async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const product = await prisma.product.findUnique({
+      where: {id:productId}
+    })
+
+    if (!product) {
+      return res.status(404).json({
+        message: "produk tidak ditemukan",
+        success: false
+      });
+    }
+
+    return res.status(200).json({
+      message: "Produk berhasil ditemukan",
+      success: true,
+      code: 200,
+      data:product
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    }); 
+  }
+}
+
+export const getProductByCategory = async (req,res) => {
+  try {
+    const categoryById = req.params.id;
+    const product = await prisma.product.findMany({
+      where: {categoryId:Number(categoryById)}
+    })
+
+    if (!product) {
+      return res.status(404).json({
+        message: "produk tidak ditemukan",
+        success: false
+      });
+    }
+
+    return res.status(200).json({
+      message: "Produk berhasil ditemukan",
+      success: true,
+      code: 200,
+      data:product
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    });
+  }
+}
