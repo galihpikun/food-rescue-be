@@ -1,13 +1,14 @@
 import express from "express";
-import { createOrder, getOrders } from "../controllers/orderController.js";
+import { createOrder, getOrders, UpdateOrderStatus } from "../controllers/orderController.js";
 import { jwtMiddleware } from "../middlewares/authMiddleware.js";
 
 const routeOrder = express.Router();
 
-routeOrder.post('/', jwtMiddleware, createOrder);
-
+// route statis
 routeOrder.get('/', jwtMiddleware, getOrders);
 
-// routeOrder.put('/:id/status', jwtMiddleware, updateOrderStatus);
+// route dinamis
+routeOrder.post('/', jwtMiddleware, createOrder);
+routeOrder.put('/:id/status', jwtMiddleware, UpdateOrderStatus);
 
 export default routeOrder;

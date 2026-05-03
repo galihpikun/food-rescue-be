@@ -4,7 +4,8 @@ import { createCategory, getCategories } from "../controllers/categoryController
 
 const routeCategory = express.Router();
 
+// route statis
+routeCategory.get('/', getCategories); // bisa diakses tanpa login
 routeCategory.post('/', jwtMiddleware, createCategory);
-routeCategory.get('/', getCategories);
 
 export default routeCategory;
