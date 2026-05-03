@@ -84,7 +84,7 @@ enum Role {
 
 enum DeliveryType {
   DELIVERY
-  SELF_PICKUP
+  PICKUP
 }
 
 enum OrderStatus {
