@@ -1,4 +1,5 @@
-import {prisma} from "../config/db.js"
+// src/controllers/productController.js
+import { prisma } from "../config/db.js"
 
 export const createProduct = async (req, res) => {
   const {
@@ -16,14 +17,6 @@ export const createProduct = async (req, res) => {
   const imageUrl = req.file ? req.file.path : null; 
 
   const userId = req.user.id;
-  const userRole = req.user.role;
-
-  if (userRole !== "MERCHANT") {
-    return res.status(403).json({
-      message: "kamu bukan merchant brok",
-      success: false,
-    });
-  }
 
   try {
     const restaurant = await prisma.restaurant.findUniqueOrThrow({
@@ -137,14 +130,6 @@ export const editProduct = async (req, res) => {
   const imageUrl = req.file ? req.file.path : undefined;
 
   const userId = req.user.id;
-  const userRole = req.user.role;
-
-  if (userRole !== "MERCHANT") {
-    return res.status(403).json({
-      message: "kamu bukan merchant brok",
-      success: false,
-    });
-  }
 
   try {
     const product = await prisma.product.findUnique({
@@ -193,14 +178,6 @@ export const deleteProduct = async (req, res) => {
   const productId = req.params.id;
 
   const userId = req.user.id;
-  const userRole = req.user.role;
-
-  if (userRole !== "MERCHANT") {
-    return res.status(403).json({
-      message: "kamu bukan merchant brok",
-      success: false
-    });
-  }
 
   try {
     const product = await prisma.product.findUnique({
@@ -303,49 +280,42 @@ export const getProductByCategory = async (req,res) => {
 }
 
 export const getOwnedProducts = async (req, res) => {
-  const userId = req.user.id;
-  const userRole = req.user.role;
+  const userId = req.user.id;
 
-  if (userRole !== "MERCHANT") {
-    return res.status(403).json({
-      message: "kamu bukan merchant",
-      success: false,
-    });
-  }
-  try {
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { userId },
-    });
+  try {
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { userId },
+    });
 
-    if (!restaurant) {
-      return res.status(404).json({
-        message: "kamu belum punya restaurant",
-        success: false,
-      });
-    }
+    if (!restaurant) {
+      return res.status(404).json({
+        message: "kamu belum punya restaurant",
+        success: false,
+      });
+    }
 
-    const products = await prisma.product.findMany({
-      where: {
-        restaurantId: restaurant.id,
-      },
-      include: {
-        category: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const products = await prisma.product.findMany({
+      where: {
+        restaurantId: restaurant.id,
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-    return res.status(200).json({
-      message: "berhasil mengambil produk",
-      success: true,
-      data: products,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Internal Server Error",
-      success: false,
-    });
-  }
+    return res.status(200).json({
+      message: "berhasil mengambil produk",
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
 };
