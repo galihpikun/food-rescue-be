@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register, getProfile, logout } from '../controllers/authController.js';
+import { login, register, getProfile, logout, editProfile } from '../controllers/authController.js';
 import { jwtMiddleware } from '../middlewares/authMiddleware.js';
 
 const routeAuth = express.Router();
@@ -11,5 +11,6 @@ routeAuth.post('/login', login);
 // route protected
 routeAuth.get('/profile', jwtMiddleware, getProfile);
 routeAuth.post('/logout', jwtMiddleware, logout);
+routeAuth.put('/profile', jwtMiddleware, editProfile);
 
 export default routeAuth;

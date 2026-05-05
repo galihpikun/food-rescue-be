@@ -61,10 +61,8 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  // Destructure data
   const { email, password } = req.body;
   try {
-    // If exist check
     const emailExists = await prisma.user.findUnique({
       where: {
         email: email,
@@ -90,7 +88,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate TOken JWT
     const token = generateToken({
       id: emailExists.id,
       fullname: emailExists.fullname,
@@ -154,6 +151,56 @@ export const getProfile = async (req, res) => {
     })
   } catch (error) {
     res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    })
+  }
+}
+
+export const editProfile = async (req, res) => {
+  const userId = req.user.id;
+  const { fullname, password } = req.body;
+
+  try {
+    let updateData = {};
+
+    if (fullname){ 
+        updateData.fullname = fullname;
+      }
+
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        updateData.password = await bcrypt.hash(password, salt);
+      };
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({
+          message: 'tidak ada perubahan yang terjadi!',
+          success: false
+        })
+      };
+
+      const updateUser = await prisma.user.update({
+        where: { id : userId },
+        data: updateData,
+        select: {
+          id: true,
+          fullname: true,
+          email: true,
+          role: true,
+          updatedAt: true
+        }
+      });
+
+      return res.status(200).json({
+        message: "profile berhasil di update",
+        success: true,
+        data: updateUser,
+      });
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
       message: "Internal Server Error",
       success: false
     })
