@@ -125,6 +125,75 @@ export const getProducts = async (req, res) => {
   }
 };
 
+export const editProduct = async (req, res) => {
+  const productId = req.params.id;
+  const userId = req.user.id;
+
+  const {
+    name,
+    description,
+    type,
+    originalPrice,
+    sellingPrice,
+    stock,
+    categoryId,
+    flashSaleStartTime,
+    flashSaleEndTime,
+  } = req.body;
+
+  const imageUrl = req.file ? req.file.path : undefined;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { restaurant: true },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Produk tidak ditemukan",
+        success: false,
+      });
+    }
+
+    if (product.restaurant.userId !== userId) {
+      return res.status(403).json({
+        message: "Kamu tidak berhak mengedit produk ini",
+        success: false,
+      });
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: {
+        name: name || product.name,
+        description: description || product.description,
+        type: type || product.type,
+        originalPrice: originalPrice ? Number(originalPrice) : product.originalPrice,
+        sellingPrice: sellingPrice ? Number(sellingPrice) : product.sellingPrice,
+        stock: stock !== undefined ? Number(stock) : product.stock, 
+        imageUrl: imageUrl !== undefined ? imageUrl : product.imageUrl,
+        categoryId: categoryId ? Number(categoryId) : product.categoryId,
+        flashSaleStartTime: flashSaleStartTime ? new Date(flashSaleStartTime) : product.flashSaleStartTime,
+        flashSaleEndTime: flashSaleEndTime ? new Date(flashSaleEndTime) : product.flashSaleEndTime,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Produk berhasil diperbarui!",
+      success: true,
+      data: updatedProduct,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
 export const deleteProduct = async (req, res) => {
   const productId = req.params.id;
 

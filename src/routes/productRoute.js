@@ -1,7 +1,7 @@
 import express from "express";
 import { 
   createProduct, deleteProduct, 
-  getOwnedProducts, getProductByCategory, getProductById, getProducts 
+  getOwnedProducts, getProductByCategory, getProductById, getProducts, editProduct
 } from "../controllers/productController.js";
 import { jwtMiddleware } from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/uploadMiddleware.js";
@@ -18,5 +18,6 @@ routeProduct.get('/:id', jwtMiddleware, getProductById);
 routeProduct.get("/owned", jwtMiddleware, isMerchant, getOwnedProducts); 
 routeProduct.post('/', jwtMiddleware, isMerchant, upload.single('image'), createProduct);
 routeProduct.delete('/:id', jwtMiddleware, isMerchant, deleteProduct); 
+routeProduct.put('/:id', jwtMiddleware, isMerchant, upload.single('image'), editProduct);
 
 export default routeProduct;

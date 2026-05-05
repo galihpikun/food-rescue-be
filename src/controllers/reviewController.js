@@ -2,6 +2,7 @@ import { prisma } from "../config/db.js";
 
 export const createReview = async (req, res) => {
     const { orderId, rating, comment } = req.body;
+    const userId = req.user.id;
 
     if (!rating || rating < 1 || rating > 5) {
         return res.status(400).json({
@@ -70,7 +71,7 @@ export const createReview = async (req, res) => {
 }
 
 export const getReviews = async (req, res) => {
-    const productId = req.params;
+    const productId = req.params.id;
     try {
         const review = await prisma.review.findMany({
             where: { productId },

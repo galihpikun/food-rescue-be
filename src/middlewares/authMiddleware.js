@@ -9,9 +9,9 @@ export function jwtMiddleware(req, res, next) {
       message: "Token tidak ditemukan, akses ditolak",
     });
   }
-  // MIsahin Toket dari prefix
+  // Misahin Token dari prefix
   const token = headerToken.split(" ")[1];
-  // ngecek toketnya bener kaga
+  // ngecek tokennya bener kaga
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).json({

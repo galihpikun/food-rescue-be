@@ -153,9 +153,9 @@ export const UpdateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const userId = req.user.id;
-    const userRole= req.user.role;
+    const userRole = req.user.role;
 
-    if (userRole === 'MERCHANT') {
+    if (userRole !== 'MERCHANT') {
         return res.status(403).json({
             success: false,
             message: "role tidak sesuai"
