@@ -3,62 +3,85 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
-  // Destructure data dari request body
-  const { fullname, email, password } = req.body;
+  const {
+    fullname,
+    email,
+    password,
+    role, 
+    restaurantName,
+    restaurantAddress,
+    restaurantDescription,
+  } = req.body;
 
-  // Validasi input
-  if (!fullname || !email || !password) {
+  if (!fullname || !email || !password)
     return res.status(400).json({
-      code: 400,
-      message: "Please fill all of the fields",
+      message: "tolong lengkapi",
       success: false,
     });
-  }
 
-  // if exist check
-  const emailExists = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
+    if (role === "MERCHANT" ) {
+      if (!restaurantName || !restaurantAddress) {
+        return res.status(400).json({
+          message: "name restoran dan alamat wajib diisi",
+          success: false,
+        });
+      }
+    }
 
-  if (emailExists) {
-    return res.status(400).json({
-      code: 400,
-      message: "Email sudah ada yang punya, Ubah lol",
-      success: false,
+    const emailExists = await prisma.user.findUnique({
+      where: { email: email}
     });
-  }
 
-  // encrypt password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPw = await bcrypt.hash(password, salt);
+    if (emailExists) {
+      return res.status(400).json({
+        message: "email sudah terdaftar",
+        success: false,
+      });
+    }
 
-  try {
-    const user = await prisma.user.create({
-      data: {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    try {
+      let userData = {
         fullname: fullname,
         email: email,
-        password: hashedPw,
-      },
-    });
+        password: hashedPassword,
+        role: role === "MERCHANT" ? "MERCHANT" : "CUSTOMER"
+      }
 
-    return res.status(200).json({
-      code: 200,
-      success: true,
-      message: "Berhasil register Data",
-      data: user,
-    });
+      if (role === "MERCHANT") {
+        userData.restaurant = {
+          create: {
+            name: restaurantName,
+            address: restaurantAddress,
+            description: restaurantDescription || null,
+          }
+        }
+      }
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      code: 500,
-      message: "Internal Server Error",
-      success: false,
-    });
+      const user = await prisma.user.create({
+        data: userData,
+        include: {
+          restaurant: true,
+        },
+      });
+
+      delete user.password // hapus password dari objek user, sebelom dikirim responnya
+
+      return res.status(200).json({
+        message: role === "MERCHANT" ? "registrasi restoran berhasil" : "registrasi berhasil",
+        data: user,
+        success: true,
+      })
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "internal server error",
+        success: false
+      })
+    }
   }
-};
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
