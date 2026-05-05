@@ -17,6 +17,7 @@ model User {
   fullname   String
   orders     Order[]
   restaurant Restaurant?
+  reviews    Review[]    // <-- Relasi ke tabel Review
 }
 
 model Restaurant {
@@ -56,6 +57,7 @@ model Product {
   orders             Order[]
   category           Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   restaurant         Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  reviews            Review[]    // <-- Relasi ke tabel Review
 }
 
 model Order {
@@ -75,6 +77,25 @@ model Order {
   updatedAt         DateTime     @updatedAt
   product           Product      @relation(fields: [productId], references: [id])
   user              User         @relation(fields: [userId], references: [id])
+  review            Review?      // <-- Relasi ke tabel Review (Satu order hanya boleh punya satu review)
+}
+
+// --- MODEL BARU UNTUK RATING & ULASAN ---
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      // Menyimpan bintang 1 sampai 5
+  comment   String?  // Ulasan teks
+  
+  userId    String
+  productId String
+  orderId   String   @unique // 1 pesanan hanya boleh diberi 1 ulasan
+  
+  createdAt DateTime @default(now())
+
+  // Relasi
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
 }
 
 enum Role {
