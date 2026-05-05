@@ -1,12 +1,13 @@
 import express from 'express';
-import routeAuth from './routes/authRoute.js';
+import cors from 'cors';
 import { jwtMiddleware } from './middlewares/authMiddleware.js';
+
+import routeAuth from './routes/authRoute.js';
 import routeRestaurant from './routes/restaurantRoute.js';
 import routeProduct from './routes/productRoute.js';
 import routeOrder from './routes/orderRoute.js';
-import cors from 'cors';
 import routeCategory from './routes/categoryRoute.js';
-
+import reviewRoute from './routes/reviewRoute.js';
 
 const app = express();
 const port = 8000;
@@ -27,6 +28,8 @@ app.use('/api/products', routeProduct);
 app.use('/api/orders', routeOrder);
 
 app.use('/api/categories', routeCategory);
+
+app.use('/api/reviews', reviewRoute)
 // Protected Route
 app.get('/', jwtMiddleware, (req, res) => {
   res.send('Hello World!')
