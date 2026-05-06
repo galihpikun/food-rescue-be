@@ -198,15 +198,33 @@ export const UpdateOrderStatus = async (req, res) => {
             })
         }
         
-        const updateOrder = await prisma.order.update({
-            where: { id: id},
-            data: { status: status }
+        const result = await prisma.$transaction(async (tx) => {
+            const updatedOrder = await tx.order.update({
+                where: { id: id},
+                data: { status: status }
+            });
+
+            if (status === 'CANCELLED' && order.status !== 'CANCELLED') {
+                await tx.product.update({
+                    where: { id: order.productId },
+                    data: { stock: { increment: order.quantity } }
+                });
+            }
+
+            if (status === 'COMPLETED' && order.status !== 'COMPLETED') {
+                await tx.restaurant.update({
+                    where: { id: order.product.restaurant.id },
+                    data: { totalRevenue: { increment: order.netSellerRevenue } }
+                });
+            }
+
+            return updatedOrder;
         });
 
         return res.status(200).json({
             success: true,
             message: `status pesanan berhasil diubah jadi ${status}`,
-            data: updateOrder 
+            data: result 
         })
         
     } catch (error) {

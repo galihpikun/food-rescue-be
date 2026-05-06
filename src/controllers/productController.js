@@ -19,7 +19,7 @@ export const createProduct = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const restaurant = await prisma.restaurant.findUniqueOrThrow({
+    const restaurant = await prisma.restaurant.findUnique({
       where: { userId: userId },
     });
 
@@ -276,7 +276,7 @@ export const getProductByCategory = async (req,res) => {
       where: {categoryId:Number(categoryById)}
     })
 
-    if (!product) {
+    if (!product || product.length === 0) {
       return res.status(404).json({
         message: "produk tidak ditemukan",
         success: false
