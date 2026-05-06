@@ -66,6 +66,13 @@ export const createOrder = async (req, res) => {
             return newOrder
         });
 
+        const io = req.app.get('io');
+        
+        io.emit('pesanan_baru', {
+            message: "Ada pesanan masuk nih!",
+            orderData: result
+        });
+
         return res.status(201).json({
             success: true,
             message: "Pesanan berhasil dibuat!",
@@ -80,7 +87,6 @@ export const createOrder = async (req, res) => {
             message: "Internal server error"
         });
     }
-    
 }
 
 export const getOrders = async (req, res) => {
