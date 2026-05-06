@@ -18,6 +18,6 @@ routeProduct.get('/:id', jwtMiddleware, getProductById);
 routeProduct.get("/owned", jwtMiddleware, isMerchant, getOwnedProducts); 
 routeProduct.post('/', jwtMiddleware, isMerchant, upload.single('image'), createProduct);
 routeProduct.delete('/:id', jwtMiddleware, isMerchant, deleteProduct); 
-routeProduct.put('/:id', jwtMiddleware, isMerchant, upload.single('image'), editProduct);
+routeProduct.put('/:id', jwtMiddleware, isMerchant, upload.single('image'), editProduct); 
 
 export default routeProduct;

@@ -1,5 +1,5 @@
 import express from "express";
-import { createReview, getReviews, updateReview, deleteReview } from "../controllers/reviewController.js";
+import { createReview, updateReview, deleteReview, getRestaurantReviews, getProductReviews } from "../controllers/reviewController.js";
 import { jwtMiddleware } from "../middlewares/authMiddleware.js";
 
 const routeReview = express.Router();
@@ -10,6 +10,7 @@ routeReview.put("/:id", jwtMiddleware, updateReview);
 routeReview.delete("/:id", jwtMiddleware, deleteReview);
 
 // route public
-routeReview.get('/:id', getReviews);
+routeReview.get('/product/:productId', getProductReviews);
+routeReview.get('/restaurant/:restaurantId', getRestaurantReviews);
 
-export default routeReview; 
+export default routeReview;

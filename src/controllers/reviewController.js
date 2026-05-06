@@ -70,23 +70,54 @@ export const createReview = async (req, res) => {
     }
 }
 
-export const getReviews = async (req, res) => {
-    const productId = req.params.id;
+// satu produk
+export const getProductReviews = async (req, res) => {
+    const productId = req.params.productId;
     try {
-        const review = await prisma.review.findMany({
+        const reviews = await prisma.review.findMany({
             where: { productId },
             include: {
-                user: {
-                    select: { fullname: true },
-                },
+                user: { select: { fullname: true } },
             },
             orderBy: { createdAt: 'desc' },
         });
 
-        return res.status(201).json({
-            message: 'review berhasil diambil',
+        return res.status(200).json({ 
+            message: 'Semua ulasan produk berhasil diambil',
             success: true,
-            data: review,
+            data: reviews,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'internal server error',
+            success: false
+        });
+    }
+}
+
+// satu restoran
+export const getRestaurantReviews = async (req, res) => {
+    const restaurantId = req.params.restaurantId;
+    try {
+        const reviews = await prisma.review.findMany({
+            where: { 
+                product: {
+                    restaurantId: restaurantId 
+                } 
+            },
+            include: {
+                user: { select: { fullname: true } },
+                product: { select: { name: true, imageUrl: true } } 
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        return res.status(200).json({
+            message: 'Semua ulasan toko berhasil diambil',
+            success: true,
+            data: reviews,
         });
 
     } catch (error) {
