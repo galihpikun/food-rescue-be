@@ -64,6 +64,7 @@ model Order {
   id                String       @id @default(uuid())
   userId            String
   productId         String
+  note              String?
   itemPrice         Int
   quantity          Int          @default(1)
   platformFeeBuyer  Int          @default(0)

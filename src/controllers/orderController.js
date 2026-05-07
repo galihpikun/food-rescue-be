@@ -1,7 +1,7 @@
 import { prisma } from "../config/db.js";
 
 export const createOrder = async (req, res) => {
-    const {productId, quantity, deliveryType} = req.body;
+    const {productId, quantity, deliveryType, note} = req.body;
     const userId = req.user.id;
 
     try {
@@ -45,6 +45,7 @@ export const createOrder = async (req, res) => {
                 data: {
                     userId,
                     productId,
+                    note,
                     itemPrice,
                     quantity,
                     platformFeeBuyer,
