@@ -7,7 +7,7 @@
 
 ## 🛠 Teknologi Utama
 - **Node.js & Express.js**: Framework utama backend.
-- **PostgreSQL**: Database relasional yang tangguh.
+- **PostgreSQL Supabase**: Database relasional yang tangguh.
 - **Prisma ORM**: *Object-Relational Mapper* untuk interaksi yang mulus dan *type-safe* dengan database.
 - **Socket.io**: Implementasi WebSocket untuk memberikan notifikasi pesanan masuk (*real-time*) ke sisi restoran/merchant tanpa jeda.
 - **Cloudinary & Multer**: Solusi pengunggahan (*upload*) dan penyimpanan gambar makanan yang teroptimasi di komputasi awan.
@@ -93,12 +93,13 @@ food-rescue-be/
    Lakukan *push* skema Prisma untuk men-generate struktur tabel ke PostgreSQL lokal Anda:
    ```bash
    npx prisma db push
+   npx prisma generate
    ```
 
 4. **Menyalakan Server**
    Gunakan script bawaan untuk menjalankan mode *development*:
    ```bash
-   npm run dev
+   npx nodemon src/app.js
    ```
    _Server akan berjalan dan mendengarkan port 8000 secara default._
 
