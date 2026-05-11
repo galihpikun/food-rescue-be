@@ -119,6 +119,3 @@ food-rescue-be/
 *   **Ulasan (Reviews):**
     *   `POST /api/reviews/create` - Memberi rating
     *   `GET /api/reviews/restaurant/:restaurantId` - Analitik ulasan untuk suatu restoran
-
----
-*Dokumen ini disusun untuk memudahkan juri dan penguji dalam memahami pondasi arsitektur Food Rescue Backend.*

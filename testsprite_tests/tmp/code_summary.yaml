@@ -1,0 +1,67 @@
+version: "2"
+type: backend
+tech_stack:
+  - Node.js
+  - Express.js
+  - PostgreSQL (Supabase)
+  - Prisma
+  - Socket.io
+  - Cloudinary
+features:
+  - name: Auth API
+    description: User and Merchant authentication
+    files:
+      - src/routes/authRoutes.js
+      - src/controllers/authController.js
+    endpoints:
+      - method: POST
+        path: /api/auth/register
+        description: Register a new user or merchant
+        auth_required: false
+      - method: POST
+        path: /api/auth/login
+        description: Login
+        auth_required: false
+  - name: Product API
+    description: Manage surplus food products
+    files:
+      - src/routes/productRoutes.js
+      - src/controllers/productController.js
+    endpoints:
+      - method: GET
+        path: /api/products
+        description: List products
+        auth_required: false
+      - method: POST
+        path: /api/products
+        description: Add a product
+        auth_required: true
+  - name: Order API
+    description: Handle orders and transactions
+    files:
+      - src/routes/orderRoutes.js
+      - src/controllers/orderController.js
+    endpoints:
+      - method: POST
+        path: /api/orders
+        description: Create an order
+        auth_required: true
+      - method: PUT
+        path: /api/orders/:id/status
+        description: Update order status
+        auth_required: true
+  - name: Review API
+    description: Handle product reviews
+    files:
+      - src/routes/reviewRoutes.js
+      - src/controllers/reviewController.js
+    endpoints:
+      - method: POST
+        path: /api/reviews/create
+        description: Create a review
+        auth_required: true
+      - method: GET
+        path: /api/reviews/restaurant/:restaurantId
+        description: Get restaurant reviews
+        auth_required: false
+known_limitations: []
