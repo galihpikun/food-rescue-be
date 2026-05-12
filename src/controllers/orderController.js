@@ -237,3 +237,34 @@ export const UpdateOrderStatus = async (req, res) => {
     }
 
 }
+
+export const getUserOrders = async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const orders = await prisma.order.findMany({
+            where: { userId: userId },
+            include: {
+                product: {
+                    select: {
+                        name: true,
+                        type: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Orders retrieved successfully",
+            data: orders
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
