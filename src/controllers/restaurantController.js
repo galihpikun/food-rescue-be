@@ -106,7 +106,7 @@ export const getHotRestaurants = async (req, res) => {
       },
     });
 
-    // hitung total order tiap resto
+    // hitung total order tiap resto 
     const hotRestaurants = restaurants.map((restaurant) => {
       const totalOrders = restaurant.products.reduce(
         (total, product) => total + product._count.orders,
@@ -119,7 +119,7 @@ export const getHotRestaurants = async (req, res) => {
       };
     });
 
-    // sort paling banyak odernya
+    // sort berdasarkan paling banyak cuan, wlee
     hotRestaurants.sort((a, b) => b.totalOrders - a.totalOrders);
 
     return res.status(200).json({

@@ -1,5 +1,5 @@
 // src/controllers/productController.js
-import { prisma } from "../config/db.js"
+import { prisma } from "../config/db.js";
 
 export const createProduct = async (req, res) => {
   const {
@@ -14,7 +14,7 @@ export const createProduct = async (req, res) => {
     flashSaleEndTime,
   } = req.body;
 
-  const imageUrl = req.file ? req.file.path : null; 
+  const imageUrl = req.file ? req.file.path : null;
 
   const userId = req.user.id;
 
@@ -44,8 +44,8 @@ export const createProduct = async (req, res) => {
         type: type || "REGULAR",
         originalPrice: Number(originalPrice),
         sellingPrice: Number(sellingPrice),
-        stock: stock ? Number(stock) : 1, 
-        imageUrl, 
+        stock: stock ? Number(stock) : 1,
+        imageUrl,
         categoryId: Number(categoryId),
         restaurantId: restaurant.id,
         flashSaleStartTime: flashSaleStartTime
@@ -71,56 +71,57 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 10} = req.query;
+    const { search = "", page = 1, limit = 10 } = req.query;
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
 
     const skip = (pageNumber - 1) * limitNumber;
 
-  const searchCondition = search 
-  ? {
-    name: {
-      contains: search,
-      mode: "insensitive",
-    }
-  } : {}; 
+    const searchCondition = search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        }
+      : {};
 
-  const [products, totalItems] = await Promise.all([
-    prisma.product.findMany({
-      where: searchCondition,
-      skip: skip,
-      take: limitNumber,
-      orderBy: {
-        createdAt: 'desc',
+    const [products, totalItems] = await Promise.all([
+      prisma.product.findMany({
+        where: searchCondition,
+        skip: skip,
+        take: limitNumber,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          restaurant: { select: { name: true } },
+          category: true,
+        },
+      }),
+      prisma.product.count({
+        where: searchCondition,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limitNumber);
+
+    return res.status(200).json({
+      message: "berhasil fetch produk",
+      success: true,
+      data: products,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages: totalPages,
+        totalItems: totalItems,
+        limit: limitNumber,
       },
-      include: {
-        restaurant: { select: { name: true}},
-        category: true
-      ,}
-    }),
-    prisma.product.count({
-      where: searchCondition,
-    }),
-  ]);
-
-  const totalPages = Math.ceil(totalItems / limitNumber);
-
-  return res.status(200).json({
-    message: "berhasil fetch produk",
-    success: true,
-    data: products,
-    pagination: {
-      currentPage: pageNumber,
-      totalPages: totalPages,
-      totalItems: totalItems,
-      limit: limitNumber,
-    },
-  });
+    });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     return res.status(500).json({
-      message: 'internal server error',
-      success: false
+      message: "internal server error",
+      success: false,
     });
   }
 };
@@ -169,13 +170,21 @@ export const editProduct = async (req, res) => {
         name: name || product.name,
         description: description || product.description,
         type: type || product.type,
-        originalPrice: originalPrice ? Number(originalPrice) : product.originalPrice,
-        sellingPrice: sellingPrice ? Number(sellingPrice) : product.sellingPrice,
-        stock: stock !== undefined ? Number(stock) : product.stock, 
+        originalPrice: originalPrice
+          ? Number(originalPrice)
+          : product.originalPrice,
+        sellingPrice: sellingPrice
+          ? Number(sellingPrice)
+          : product.sellingPrice,
+        stock: stock !== undefined ? Number(stock) : product.stock,
         imageUrl: imageUrl !== undefined ? imageUrl : product.imageUrl,
         categoryId: categoryId ? Number(categoryId) : product.categoryId,
-        flashSaleStartTime: flashSaleStartTime ? new Date(flashSaleStartTime) : product.flashSaleStartTime,
-        flashSaleEndTime: flashSaleEndTime ? new Date(flashSaleEndTime) : product.flashSaleEndTime,
+        flashSaleStartTime: flashSaleStartTime
+          ? new Date(flashSaleStartTime)
+          : product.flashSaleStartTime,
+        flashSaleEndTime: flashSaleEndTime
+          ? new Date(flashSaleEndTime)
+          : product.flashSaleEndTime,
       },
     });
 
@@ -184,7 +193,6 @@ export const editProduct = async (req, res) => {
       success: true,
       data: updatedProduct,
     });
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -203,18 +211,18 @@ export const deleteProduct = async (req, res) => {
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: {
-        restaurant: true
-      }
+        restaurant: true,
+      },
     });
 
     if (!product) {
       return res.status(404).json({
         message: "produk tidak ditemukan",
-        success: false
+        success: false,
       });
     }
 
-     if (product.restaurant.userId !== userId) {
+    if (product.restaurant.userId !== userId) {
       return res.status(403).json({
         message: "bukan owner produk ini",
         success: false,
@@ -222,19 +230,18 @@ export const deleteProduct = async (req, res) => {
     }
 
     await prisma.product.delete({
-      where: { id: productId }
+      where: { id: productId },
     });
 
     return res.status(200).json({
       message: "produk berhasil dihapus",
-      success: true
+      success: true,
     });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       message: "Internal Server Error",
-      success: false
+      success: false,
     });
   }
 };
@@ -243,13 +250,13 @@ export const getProductById = async (req, res) => {
   const productId = req.params.id;
   try {
     const product = await prisma.product.findUnique({
-      where: {id:productId}
-    })
+      where: { id: productId },
+    });
 
     if (!product) {
       return res.status(404).json({
         message: "produk tidak ditemukan",
-        success: false
+        success: false,
       });
     }
 
@@ -257,29 +264,28 @@ export const getProductById = async (req, res) => {
       message: "Produk berhasil ditemukan",
       success: true,
       code: 200,
-      data:product
+      data: product,
     });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       message: "Internal Server Error",
-      success: false
-    }); 
+      success: false,
+    });
   }
-}
+};
 
-export const getProductByCategory = async (req,res) => {
+export const getProductByCategory = async (req, res) => {
   try {
     const categoryById = req.params.id;
     const product = await prisma.product.findMany({
-      where: {categoryId:Number(categoryById)}
-    })
+      where: { categoryId: Number(categoryById) },
+    });
 
     if (!product || product.length === 0) {
       return res.status(404).json({
         message: "produk tidak ditemukan",
-        success: false
+        success: false,
       });
     }
 
@@ -287,17 +293,16 @@ export const getProductByCategory = async (req,res) => {
       message: "Produk berhasil ditemukan",
       success: true,
       code: 200,
-      data:product
+      data: product,
     });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       message: "Internal Server Error",
-      success: false
+      success: false,
     });
   }
-}
+};
 
 export const getOwnedProducts = async (req, res) => {
   const userId = req.user.id;

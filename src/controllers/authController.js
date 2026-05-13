@@ -67,7 +67,8 @@ export const register = async (req, res) => {
         },
       });
 
-      delete user.password // hapus password dari objek user, sebelom dikirim responnya
+      // hapus password daridata user, sebelom direturn dibawah
+      delete user.password 
 
       return res.status(200).json({
         message: role === "MERCHANT" ? "registrasi restoran berhasil" : "registrasi berhasil",
@@ -100,7 +101,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // compare password
     const isPwValid = await bcrypt.compare(password, emailExists.password);
 
     if (!isPwValid) {
@@ -111,6 +111,7 @@ export const login = async (req, res) => {
       });
     }
 
+    // Send payload ke token generate
     const token = generateToken({
       id: emailExists.id,
       fullname: emailExists.fullname,

@@ -53,7 +53,7 @@ app.use('/api/categories', routeCategory);
 app.use('/api/reviews', reviewRoute)
 // Protected Route
 app.get('/', (req, res) => {
-  res.send('Bisa agung!')
+  res.send('Api Bekerja!')
 })
 
 server.listen(port, () => {
