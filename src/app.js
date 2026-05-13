@@ -52,8 +52,8 @@ app.use('/api/categories', routeCategory);
 
 app.use('/api/reviews', reviewRoute)
 // Protected Route
-app.get('/', jwtMiddleware, (req, res) => {
-  res.send('Hello World!')
+app.get('/', (req, res) => {
+  res.send('Bisa agung!')
 })
 
 server.listen(port, () => {
