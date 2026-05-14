@@ -273,3 +273,65 @@ export const getUserOrders = async (req, res) => {
     });
   }
 };
+
+export const getOrderById = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.role;
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: id },
+      include: {
+        user: {
+          select: {
+            fullname: true,
+            email: true,
+          },
+        },
+        product: {
+          include: {
+            restaurant: {
+              select: {
+                id: true,
+                name: true,
+                userId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order tidak ditemukan",
+      });
+    }
+
+   
+    // validasi buat ngecek pemilik ordernya bukan, biar ga colong data
+    const isCustomerOwner = order.userId === userId;
+    const isMerchantOwner = order.product.restaurant.userId === userId;
+
+    if (!isCustomerOwner && !isMerchantOwner) {
+      return res.status(403).json({
+        success: false,
+        message: "Kamu tidak punya akses ke data ini",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil detail order",
+      data: order,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
