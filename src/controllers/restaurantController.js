@@ -119,7 +119,7 @@ export const getHotRestaurants = async (req, res) => {
       };
     });
 
-    // sort paling banyak odernya
+    // sort paling banyak ordernya
     hotRestaurants.sort((a, b) => b.totalOrders - a.totalOrders);
 
     return res.status(200).json({

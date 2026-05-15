@@ -12,10 +12,10 @@ const routeProduct = express.Router();
 // route publik (hanya butuh login)
 routeProduct.get('/', jwtMiddleware, getProducts);
 routeProduct.get('/category/:id', jwtMiddleware, getProductByCategory);
-routeProduct.get('/:id', jwtMiddleware, getProductById); 
-
 // route khusus merchant
 routeProduct.get("/owned", jwtMiddleware, isMerchant, getOwnedProducts); 
+
+routeProduct.get('/:id', jwtMiddleware, getProductById); 
 routeProduct.post('/', jwtMiddleware, isMerchant, upload.single('image'), createProduct);
 routeProduct.delete('/:id', jwtMiddleware, isMerchant, deleteProduct); 
 routeProduct.put('/:id', jwtMiddleware, isMerchant, upload.single('image'), editProduct); 
